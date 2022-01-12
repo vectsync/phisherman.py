@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
     desc = f.read()
 
 setup(
-    name="phisherman",
+    name="phisherman.py",
     author=phisherman.__author__,
     author_email="example@gmail.com",
     version=phisherman.__version__,
@@ -26,5 +26,5 @@ setup(
     python_requires=">=3.8",
     include_package_data=True,
     exclude=("__pycache__"),
-    install_requires=["aiohttp"],
+    install_requires=["aiohttp"]
 )
