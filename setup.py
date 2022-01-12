@@ -15,6 +15,7 @@ setup(
     license=phisherman.__license__,
     url=phisherman.__github__,
     packages=["phisherman"],
+    download_url="https://github.com/QristaLabs/phisherman.py/archive/refs/tags/v0.1.1.tar.gz",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
