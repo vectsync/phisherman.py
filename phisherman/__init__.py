@@ -1,7 +1,7 @@
 from .app import Application
 from .errors import InvalidRequest
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Vedrecide"
 __copyright__ = "Copyright (c) Vedrecide"
 __license__ = "MIT"
