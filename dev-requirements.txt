@@ -1,3 +1,4 @@
+aiohttp
 flake8
 black
 mkdocs
