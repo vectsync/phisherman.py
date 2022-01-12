@@ -6,6 +6,8 @@ from .errors import InvalidRequest, MissingPermission
 
 logger = logging.getLogger(__name__)
 
+__all__: t.List[str] = ["Application"]
+
 
 class Application:
     """
@@ -41,6 +43,7 @@ class Application:
     async def check_domain(self, domain: str) -> bool:
         """
         Checks a domain, Returns True if its suspicious else False
+
         NOTE: Even if it returns false doesn't mean the domain isn't suspicious
         it's just that the domain isn't registered in the API's Database or you
         might have entered incorrect domain
