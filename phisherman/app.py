@@ -37,12 +37,12 @@ class Application:
         self.token = token
         self.base_url = f"https://api.phisherman.gg/v{version}"
         self.session = aiohttp.ClientSession()
-        
+
     async def check_domain(self, domain: str) -> bool:
         """
         Checks a domain, Returns True if its suspicious else False
         NOTE: Even if it returns false doesn't mean the domain isn't suspicious
-        it's just that the domain isn't registered in the API's Database or you 
+        it's just that the domain isn't registered in the API's Database or you
         might have entered incorrect domain
 
         Parameters
@@ -55,21 +55,24 @@ class Application:
         bool
         """
 
-        res = await self.session.get(self.base_url + f"/domains/{domain}", headers={
-            "Content-Type": "application/json",
-            "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)"
-        })
+        res = await self.session.get(
+            self.base_url + f"/domains/{domain}",
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
+            },
+        )
 
         data = await res.read()
 
-        if 'missing permissions' in data.decode("utf-8"):
+        if "missing permissions" in data.decode("utf-8"):
             await self.session.close()
 
             raise MissingPermission("Missing permission for the API call")
 
         await self.session.close()
 
-        return True if data == b'true' else False
+        return True if data == b"true" else False
 
     async def fetch_info(self, domain: str) -> dict:
         """
@@ -85,19 +88,22 @@ class Application:
         dict
         """
 
-        res = await self.session.get(self.base_url + f"/domains/info/{domain}", headers={
-            "Authorization": f"Bearer {self.token}",
-            "Content-Type": "application/json",
-            "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)"
-        })
+        res = await self.session.get(
+            self.base_url + f"/domains/info/{domain}",
+            headers={
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+                "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
+            },
+        )
 
         data = await res.json()
 
         try:
-            if data['success'] is False:
+            if data["success"] is False:
                 await self.session.close()
 
-                if data['message'] == "invalid request":
+                if data["message"] == "invalid request":
                     raise InvalidRequest("Invalid Request, Check your domain")
 
         except KeyError:
@@ -116,25 +122,26 @@ class Application:
         guild : t.Optional[int]
             Discord Guild ID you found the site link in
         """
-        
+
         if guild:
             res = await self.session.put(
                 self.base_url + f"/domains/{domain}",
                 headers={
                     "Authorization": f"Bearer {self.token}",
                     "Content-Type": "application/json",
-                    "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)"
+                    "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
                 },
-                data={
-                    "guild": f"{guild}"
-                }
+                data={"guild": f"{guild}"},
             )
         else:
-            res = await self.session.put(self.base_url + f"/domains/{domain}", headers={
-                "Authorization": f"Bearer {self.token}",
-                "Content-Type": "application/json",
-                "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)"
-            })
+            res = await self.session.put(
+                self.base_url + f"/domains/{domain}",
+                headers={
+                    "Authorization": f"Bearer {self.token}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
+                },
+            )
 
         if res.status == 204:
             logger.info(f"Reported site '{domain}' successfully")
