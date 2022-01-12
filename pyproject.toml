@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Async API Wrapper for Phisherman.gg in Python"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+packages = [
+    { include = "phisherman" },
+    { include = "phisherman/**/*.py" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
