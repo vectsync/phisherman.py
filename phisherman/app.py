@@ -115,7 +115,7 @@ class Client:
         -------
         bool
         """
-        data = await self.fetch(Route("GET", "/domains/{domain}"), text_response=True)
+        data = await self.fetch(Route("GET", f"/domains/{domain}"), text_response=True)
 
         if not data:
             return False
