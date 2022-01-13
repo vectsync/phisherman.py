@@ -2,7 +2,7 @@
 name = "phisherman.py"
 version = "0.1.1"
 description = "Async API Wrapper for Phisherman.gg in Python"
-authors = ["Your Name <you@example.com>"]
+authors = ["Vedrecide <you@example.com>"]
 repository = "https://github.com/QristaLabs/phisherman.py"
 readme = "README.md"
 license = "MIT"
