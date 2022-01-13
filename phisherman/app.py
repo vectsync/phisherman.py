@@ -60,13 +60,16 @@ class Client:
         data = kwargs.pop("data", None)
         text_response = kwargs.pop("text_response", False)
         return_status = kwargs.pop("return_status", False)
+        auth_required = kwargs.pop("auth_required", True)
 
         # Initialize headers.
         headers = {
             "User-Agent": self.USER_AGENT,
-            "Authorization": f"Bearer {self.token}",
             **headers
         }
+
+        if auth_required:
+            headers["Authorization"] = f"Bearer {self.token}"
 
         # Initialize session.
         if not self._session:
@@ -115,7 +118,7 @@ class Client:
         -------
         bool
         """
-        data = await self.fetch(Route("GET", f"/domains/{domain}"), text_response=True)
+        data = await self.fetch(Route("GET", f"/domains/{domain}"), text_response=True, auth_required=False)
 
         if not data:
             return False
