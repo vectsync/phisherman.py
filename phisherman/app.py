@@ -51,6 +51,10 @@ class Client:
         self._session = None
         self._lock = asyncio.Lock()
 
+    async def close(self) -> None:
+        if self._session is not None:
+            await self._session.close()
+
     async def fetch(self, route: Route, **kwargs) -> t.Optional[dict]:
         headers = kwargs.pop("headers", {})
         data = kwargs.pop("data", None)
