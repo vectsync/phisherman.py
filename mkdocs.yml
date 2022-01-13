@@ -22,7 +22,7 @@ nav:
     - Home: index.md
     - Installation: installation.md
     - Code Reference:
-        - Application: workflow-reference.md
+        - Application: code-reference.md
 
 plugins:
   - search
