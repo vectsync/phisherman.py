@@ -2,7 +2,7 @@ import aiohttp
 import logging
 import typing as t
 
-from .errors import InvalidRequest, MissingPermission
+from .exceptions import InvalidRequest, MissingPermission
 
 logger = logging.getLogger(__name__)
 

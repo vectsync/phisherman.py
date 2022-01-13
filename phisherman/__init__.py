@@ -1,5 +1,5 @@
 from .app import Application
-from .errors import InvalidRequest
+from .exceptions import InvalidRequest
 
 __version__ = "0.1.1"
 __author__ = "Vedrecide"
