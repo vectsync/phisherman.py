@@ -149,7 +149,7 @@ class Client:
         success = data.get("success", False)
         if not success:
             if data.get("message", "") == "missing permission":
-                raise MissingPermission("Invalid Request, Check your domain.")
+                raise InvalidRequest("Invalid Request, Check your domain.")
 
         return data[domain]
 
