@@ -8,13 +8,11 @@ import aiohttp
 from .exceptions import InvalidRequest, MissingPermission
 from .route import Route
 
-# Logger.
+
 logger = logging.getLogger(__name__)
 
-# Star imports.
 __all__: t.Tuple[str, ...] = ("Client",)
 
-# Constants.
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
@@ -31,6 +29,7 @@ class Client:
     session : aiohttp.ClientSession
         For creating client session and to make requests
     """
+
     USER_AGENT = f"Phisherman API wrapper. Python/{PYTHON_VERSION} Aiohttp/{aiohttp.__version__}"
 
     def __init__(self, token: str) -> None:
@@ -44,10 +43,8 @@ class Client:
         version : t.Optional[int]
             Optional Argument for the API Version, Default to 1 for now
         """
-        # Token.
-        self.token = token
 
-        # Session and Lock.
+        self.token = token
         self._session = None
         self._lock = asyncio.Lock()
 
@@ -62,7 +59,6 @@ class Client:
         return_status = kwargs.pop("return_status", False)
         auth_required = kwargs.pop("auth_required", True)
 
-        # Initialize headers.
         headers = {
             "User-Agent": self.USER_AGENT,
             **headers
@@ -71,11 +67,9 @@ class Client:
         if auth_required:
             headers["Authorization"] = f"Bearer {self.token}"
 
-        # Initialize session.
         if not self._session:
             self._session = aiohttp.ClientSession()
 
-        # Fetch.
         async with self._lock:
             async with self._session.request(
                 route.method,
@@ -135,13 +129,13 @@ class Client:
         Parameters
         ----------
         domain : str
-            Domain you want to look for (Don't include 'https://')
+            Domain you want to look for
 
         Returns
         -------
         dict
         """
-        # Strip `http://` or `https://` from the domain.
+
         domain = domain.replace("https://", "").replace("http://", "")
 
         data = await self.fetch(Route("GET", f"/domains/info/{domain}"))
@@ -167,6 +161,7 @@ class Client:
         guild : t.Optional[int]
             Discord Guild ID you found the site link in
         """
+        
         data = None
 
         if guild:

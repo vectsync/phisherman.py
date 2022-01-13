@@ -5,7 +5,6 @@ class Route:
         self.method = method
         self.path = path
 
-    # Properties
     @property
     def base_url(self) -> str:
         return self.BASE_URL
