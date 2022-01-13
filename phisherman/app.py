@@ -98,7 +98,6 @@ class Client:
 
         return data
 
-
     async def check_domain(self, domain: str) -> bool:
         """
         Checks a domain, Returns True if its suspicious else False
@@ -139,16 +138,6 @@ class Client:
         -------
         dict
         """
-
-        res = await self.session.get(
-            self.base_url + f"/domains/info/{domain}",
-            headers={
-                "Authorization": f"Bearer {self.token}",
-                "Content-Type": "application/json",
-                "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
-            },
-        )
-
         # Strip `http://` or `https://` from the domain.
         domain = domain.replace("https://", "").replace("http://", "")
 
