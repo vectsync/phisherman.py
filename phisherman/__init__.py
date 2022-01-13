@@ -1,9 +1,9 @@
-from .app import Application
-from .exceptions import InvalidRequest
+from .app import Client
+from .exceptions import InvalidRequest, MissingPermission
 
 __version__ = "0.1.1"
-__author__ = "Vedrecide"
-__copyright__ = "Copyright (c) Vedrecide"
+__author__ = "Qristalabs"
+__copyright__ = "Copyright (c) Qristalabs"
 __license__ = "MIT"
 __description__ = "Asynchronous Python API Wrapper for phisherman.gg"
 __github__ = "https://github.com/QristaLabs/phisherman.py"

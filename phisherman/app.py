@@ -1,17 +1,26 @@
-import aiohttp
+import asyncio
 import logging
+import sys
 import typing as t
 
-from .exceptions import InvalidRequest, MissingPermission
+import aiohttp
 
+from .exceptions import InvalidRequest, MissingPermission
+from .route import Route
+
+# Logger.
 logger = logging.getLogger(__name__)
 
-__all__: t.List[str] = ["Application"]
+# Star imports.
+__all__: t.Tuple[str, ...] = ("Client",)
+
+# Constants.
+PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
-class Application:
+class Client:
     """
-    Application class for the API Wrapper
+    Client class for the Phiserman API Wrapper.
 
     Attributes
     ----------
@@ -21,10 +30,10 @@ class Application:
         Base URL to access the API
     session : aiohttp.ClientSession
         For creating client session and to make requests
-
     """
+    USER_AGENT = f"Phisherman API wrapper. Python/{PYTHON_VERSION} Aiohttp/{aiohttp.__version__}"
 
-    def __init__(self, token: str, version: t.Optional[int] = 1) -> None:
+    def __init__(self, token: str) -> None:
         """
         Construct an application
 
@@ -35,10 +44,56 @@ class Application:
         version : t.Optional[int]
             Optional Argument for the API Version, Default to 1 for now
         """
-
+        # Token.
         self.token = token
-        self.base_url = f"https://api.phisherman.gg/v{version}"
-        self.session = aiohttp.ClientSession()
+
+        # Session and Lock.
+        self._session = None
+        self._lock = asyncio.Lock()
+
+    async def fetch(self, route: Route, **kwargs) -> t.Optional[dict]:
+        headers = kwargs.pop("headers", {})
+        data = kwargs.pop("data", None)
+        text_response = kwargs.pop("text_response", False)
+        return_status = kwargs.pop("return_status", False)
+
+        # Initialize headers.
+        headers = {
+            "User-Agent": self.USER_AGENT,
+            "Authorization": f"Bearer {self.token}",
+            **headers
+        }
+
+        # Initialize session.
+        if not self._session:
+            self._session = aiohttp.ClientSession()
+
+        # Fetch.
+        async with self._lock:
+            async with self._session.request(
+                route.method,
+                route.url,
+                headers=headers,
+                data=data,
+                **kwargs
+            ) as res:
+                # If return status is True, return the status code.
+                if return_status:
+                    return res.status
+
+                # If status code is between 200 and 300.
+                if 300 > res.status >= 200:
+                    if text_response:
+                        data = await res.text()
+                    else:
+                        data = await res.json()
+
+                # Else, set to None.
+                else:
+                    data = None
+
+        return data
+
 
     async def check_domain(self, domain: str) -> bool:
         """
@@ -57,23 +112,13 @@ class Application:
         -------
         bool
         """
+        data = await self.fetch(Route("GET", "/domains/{domain}"), text_response=True)
 
-        res = await self.session.get(
-            self.base_url + f"/domains/{domain}",
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
-            },
-        )
+        if not data:
+            return False
 
-        data = await res.read()
-
-        if "missing permissions" in data.decode("utf-8"):
-            await self.session.close()
-
-            raise MissingPermission("Missing permission for the API call")
-
-        await self.session.close()
+        if "missing permission" in data:
+            raise MissingPermission("You don't have permission to access this API")
 
         return True if data == b"true" else False
 
@@ -100,21 +145,22 @@ class Application:
             },
         )
 
-        data = await res.json()
+        # Strip `http://` or `https://` from the domain.
+        domain = domain.replace("https://", "").replace("http://", "")
 
-        try:
-            if data["success"] is False:
-                await self.session.close()
+        data = await self.fetch(Route("GET", f"/domains/info/{domain}"))
 
-                if data["message"] == "invalid request":
-                    raise InvalidRequest("Invalid Request, Check your domain")
+        if not data:
+            return {}
 
-        except KeyError:
-            await self.session.close()
+        success = data.get("success", False)
+        if not success:
+            if data.get("message", "") == "missing permission":
+                raise MissingPermission("Invalid Request, Check your domain.")
 
-            return data[domain]
+        return data[domain]
 
-    async def report_phish(self, domain: str, guild: t.Optional[int]) -> None:
+    async def report_phish(self, domain: str, guild: t.Optional[int]) -> bool:
         """
         Report a site for phishing
 
@@ -125,26 +171,14 @@ class Application:
         guild : t.Optional[int]
             Discord Guild ID you found the site link in
         """
+        data = None
 
         if guild:
-            res = await self.session.put(
-                self.base_url + f"/domains/{domain}",
-                headers={
-                    "Authorization": f"Bearer {self.token}",
-                    "Content-Type": "application/json",
-                    "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
-                },
-                data={"guild": f"{guild}"},
-            )
-        else:
-            res = await self.session.put(
-                self.base_url + f"/domains/{domain}",
-                headers={
-                    "Authorization": f"Bearer {self.token}",
-                    "Content-Type": "application/json",
-                    "User-Agent": "Phisherman.py (https://github.com/QristaLabs/phisherman.py)",
-                },
-            )
+            data = {"guild": str(guild)}
 
-        if res.status == 204:
-            logger.info(f"Reported site '{domain}' successfully")
+        status_code = await self.fetch(Route("POST", f"/domains/report/{domain}"), data=data)
+
+        if status_code == 204:
+            return True
+        else:
+            return False
