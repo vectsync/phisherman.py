@@ -57,7 +57,7 @@ class Client:
         self,
         route: Route,
         *,
-        headers: dict = {},
+        headers: dict = None,
         data: dict = None,
         text_response: bool = False,
         return_status: str = False,
@@ -71,7 +71,7 @@ class Client:
         route : Route
             The API route you want to make a call to
         headers : dict
-            Headers for the API call, Defaults to an empty dict
+            Headers for the API call, Defaults to None
         data : dict
             Data for the API call, Defaults to None
         text_response : bool
@@ -83,6 +83,9 @@ class Client:
         -------
         t.Optional[dict]
         """
+        if headers is None:
+            headers = {}
+
         headers = {
             "User-Agent": self.USER_AGENT,
             **headers
