@@ -1,10 +1,12 @@
+import typing as t
+
 class Route:
     """
     Class used for constructing API endpoints with a given base URL
 
     Attributes
     ----------
-    method : str
+    method : t.Literal["GET", "POST", "PUT", "DELETE", "PATCH"]
         Method for the API Call
     path : str
         Endpoints for the API
@@ -12,7 +14,11 @@ class Route:
 
     BASE_URL = "https://api.phisherman.gg/v1"
 
-    def __init__(self, method: str, path: str) -> None:
+    def __init__(
+        self,
+        method: t.Literal["GET", "POST", "PUT", "DELETE", "PATCH"],
+        path: str
+    ) -> None:
         """
         Construct a route
 
