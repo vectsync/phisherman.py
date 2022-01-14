@@ -16,9 +16,7 @@ class Route:
     BASE_URL = "https://api.phisherman.gg/v1"
 
     def __init__(
-        self,
-        method: t.Literal["GET", "POST", "PUT", "DELETE", "PATCH"],
-        path: str
+        self, method: t.Literal["GET", "POST", "PUT", "DELETE", "PATCH"], path: str
     ) -> None:
         """
         Construct a route
@@ -53,5 +51,5 @@ class Route:
 
     @property
     def url(self) -> str:
-        """Returns the complete route with the """
+        """Returns the complete route with the"""
         return self.base_url + self.path

@@ -13,7 +13,9 @@ __all__: t.Tuple[str, ...] = ("Client",)
 # Logging.
 logger = logging.getLogger(__name__)
 
-PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+PYTHON_VERSION = (
+    f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+)
 
 
 class Client:
@@ -29,6 +31,7 @@ class Client:
     session : aiohttp.ClientSession
         For creating client session and to make requests
     """
+
     USER_AGENT = f"Phisherman API wrapper - Python/{PYTHON_VERSION} AIOHTTP/{aiohttp.__version__}"
 
     def __init__(self, token: str) -> None:
@@ -61,7 +64,7 @@ class Client:
         data: dict = None,
         text_response: bool = False,
         return_status: str = False,
-        auth_required: bool = True
+        auth_required: bool = True,
     ) -> t.Optional[dict]:
         """
         Fetching a response from the API
@@ -86,10 +89,7 @@ class Client:
         if headers is None:
             headers = {}
 
-        headers = {
-            "User-Agent": self.USER_AGENT,
-            **headers
-        }
+        headers = {"User-Agent": self.USER_AGENT, **headers}
 
         # TODO: Remove this auth_required logic. Redundant, as if the endpoint doesn't require auth,
         # it'll never be read, and hence passing it won't change anything.
@@ -101,10 +101,7 @@ class Client:
 
         async with self._lock:
             async with self._session.request(
-                method=route.method,
-                url=route.url,
-                headers=headers,
-                data=data
+                method=route.method, url=route.url, headers=headers, data=data
             ) as res:
                 if return_status:
                     return res.status
@@ -147,10 +144,7 @@ class Client:
         """
         domain = self.clean_domain(domain)
 
-        data = await self.fetch(
-            Route("GET", f"/domains/{domain}"),
-            auth_required=False
-        )
+        data = await self.fetch(Route("GET", f"/domains/{domain}"), auth_required=False)
 
         if not data:
             return False
@@ -208,7 +202,9 @@ class Client:
         if guild:
             data = {"guild": str(guild)}
 
-        status_code = await self.fetch(Route("POST", f"/domains/report/{domain}"), data=data)
+        status_code = await self.fetch(
+            Route("POST", f"/domains/report/{domain}"), data=data
+        )
 
         if status_code == 204:
             logger.info(f"Successfully reported the site `{guild}`")
