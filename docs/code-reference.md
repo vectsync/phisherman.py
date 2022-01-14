@@ -2,6 +2,6 @@
 
 ::: phisherman
     rendering:
-        show_source: false
+        show_source: true
     selection:
         docstring_style: "numpy"

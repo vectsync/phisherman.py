@@ -21,8 +21,7 @@ theme:
 nav:
     - Home: index.md
     - Installation: installation.md
-    - Code Reference:
-        - Application: code-reference.md
+    - Code Reference: code-reference.md
 
 plugins:
   - search
