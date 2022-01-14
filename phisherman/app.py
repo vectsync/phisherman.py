@@ -53,7 +53,16 @@ class Client:
         if self._session is not None:
             await self._session.close()
 
-    async def fetch(self, route: Route, **kwargs) -> t.Optional[dict]:
+    async def fetch(
+        self,
+        route: Route,
+        *,
+        headers: dict = {},
+        data: dict = None,
+        text_response: bool = False,
+        return_status: str = False,
+        auth_required: bool = True
+    ) -> t.Optional[dict]:
         """
         Fetching a response from the API
 
@@ -61,17 +70,19 @@ class Client:
         ----------
         route : Route
             The API route you want to make a call to
+        headers : dict
+            Headers for the API call, Defaults to an empty dict
+        data : dict
+            Data for the API call, Defaults to None
+        text_response : bool
+            Whether or not to expect text response, Defaults to False
+        auth_required : bool
+            Whether or not the auth token is required, Defaults to True
 
         Returns
         -------
         t.Optional[dict]
         """
-        headers = kwargs.pop("headers", {})
-        data = kwargs.pop("data", None)
-        text_response = kwargs.pop("text_response", False)
-        return_status = kwargs.pop("return_status", False)
-        auth_required = kwargs.pop("auth_required", True)
-
         headers = {
             "User-Agent": self.USER_AGENT,
             **headers
@@ -87,11 +98,10 @@ class Client:
 
         async with self._lock:
             async with self._session.request(
-                route.method,
-                route.url,
+                method=route.method,
+                url=route.url,
                 headers=headers,
-                data=data,
-                **kwargs
+                data=data
             ) as res:
                 if return_status:
                     return res.status
