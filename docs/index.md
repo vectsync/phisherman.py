@@ -12,10 +12,11 @@
 </a>
 </p>
 
-**Source Code**: [github.com/QristaLabs/phisherman.py](https://github.com/QristaLabs/phisherman.py)<br>
-**PyPi**: [pypi.org/project/phisherman.py](https://pypi.org/project/phisherman.py)
+### About
 
 Phisherman.py is an async API wrapper made in Python for [Phisherman.gg](https://phisherman.gg) which is a centralised database and scam links and is mainly designed for Discord bots to check URLs for any phishing links
+
+### Example
 
 ```Python
 import asyncio
@@ -32,3 +33,7 @@ async def main():
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
 ```
+
+### Links
+**Source Code**: [github.com/QristaLabs/phisherman.py](https://github.com/QristaLabs/phisherman.py)<br>
+**PyPi**: [pypi.org/project/phisherman.py](https://pypi.org/project/phisherman.py)
