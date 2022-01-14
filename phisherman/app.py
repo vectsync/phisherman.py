@@ -190,6 +190,7 @@ class Client:
         status_code = await self.fetch(Route("POST", f"/domains/report/{domain}"), data=data)
 
         if status_code == 204:
+            logger.info(f"Successfully reported the site `{guild}`")
             return True
         else:
             return False
