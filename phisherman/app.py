@@ -49,10 +49,25 @@ class Client:
         self._lock = asyncio.Lock()
 
     async def close(self) -> None:
+        """Close the client session with this async function"""
+
         if self._session is not None:
             await self._session.close()
 
     async def fetch(self, route: Route, **kwargs) -> t.Optional[dict]:
+        """
+        Fetching a response from the API
+
+        Parameters
+        ----------
+        route : Route
+            The API route you want to make a call to
+        
+        Returns
+        -------
+        t.Optional[dict]
+        """
+
         headers = kwargs.pop("headers", {})
         data = kwargs.pop("data", None)
         text_response = kwargs.pop("text_response", False)
