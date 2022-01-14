@@ -62,7 +62,7 @@ class Client:
         ----------
         route : Route
             The API route you want to make a call to
-        
+
         Returns
         -------
         t.Optional[dict]
