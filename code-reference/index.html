@@ -658,7 +658,7 @@ Client        </code>
 
     <div class="doc doc-contents ">
 
-      <p>Client class for the Phiserman API Wrapper.</p>
+      <p>Client class for the Phisherman API Wrapper.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -691,7 +691,7 @@ Client        </code>
           <summary>Source code in <code>phisherman/app.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Client class for the Phiserman API Wrapper.</span>
+<span class="sd">    Client class for the Phisherman API Wrapper.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -703,7 +703,7 @@ Client        </code>
 <span class="sd">        For creating client session and to make requests</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">USER_AGENT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Phisherman API wrapper. Python/</span><span class="si">{</span><span class="n">PYTHON_VERSION</span><span class="si">}</span><span class="s2"> Aiohttp/</span><span class="si">{</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">USER_AGENT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Phisherman API wrapper - Python/</span><span class="si">{</span><span class="n">PYTHON_VERSION</span><span class="si">}</span><span class="s2"> AIOHTTP/</span><span class="si">{</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -716,19 +716,27 @@ Client        </code>
 <span class="sd">        version : t.Optional[int]</span>
 <span class="sd">            Optional Argument for the API Version, Default to 1 for now</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
 
+        <span class="c1"># Session with lock for preventing deadlocks.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Close the client session with this async function&quot;&quot;&quot;</span>
-
+        <span class="sd">&quot;&quot;&quot;Close the client session.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n">Route</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">route</span><span class="p">:</span> <span class="n">Route</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">text_response</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">auth_required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fetching a response from the API</span>
 
@@ -736,23 +744,26 @@ Client        </code>
 <span class="sd">        ----------</span>
 <span class="sd">        route : Route</span>
 <span class="sd">            The API route you want to make a call to</span>
+<span class="sd">        headers : dict</span>
+<span class="sd">            Headers for the API call, Defaults to None</span>
+<span class="sd">        data : dict</span>
+<span class="sd">            Data for the API call, Defaults to None</span>
+<span class="sd">        text_response : bool</span>
+<span class="sd">            Whether or not to expect text response, Defaults to False</span>
+<span class="sd">        auth_required : bool</span>
+<span class="sd">            Whether or not the auth token is required, Defaults to True</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        t.Optional[dict]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">headers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">text_response</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;text_response&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">return_status</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;return_status&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">auth_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;auth_required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USER_AGENT</span><span class="p">,</span> <span class="o">**</span><span class="n">headers</span><span class="p">}</span>
 
-        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USER_AGENT</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">headers</span>
-        <span class="p">}</span>
-
+        <span class="c1"># TODO: Remove this auth_required logic. Redundant, as if the endpoint doesn&#39;t require auth,</span>
+        <span class="c1"># it&#39;ll never be read, and hence passing it won&#39;t change anything.</span>
         <span class="k">if</span> <span class="n">auth_required</span><span class="p">:</span>
             <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -761,16 +772,12 @@ Client        </code>
 
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
             <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-                <span class="n">route</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                <span class="n">route</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">route</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">route</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">return_status</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span>
 
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span> <span class="ow">or</span> <span class="mi">201</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">text_response</span><span class="p">:</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">res</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -781,28 +788,34 @@ Client        </code>
 
         <span class="k">return</span> <span class="n">data</span>
 
+    <span class="c1"># Utility methods.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">domain</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Main methods.</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">check_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Checks a domain, Returns True if its suspicious else False</span>
-
-<span class="sd">        NOTE: Even if it returns false doesn&#39;t mean the domain isn&#39;t suspicious</span>
-<span class="sd">        it&#39;s just that the domain isn&#39;t registered in the API&#39;s Database or you</span>
-<span class="sd">        might have entered incorrect domain</span>
+<span class="sd">        Checks a domain, Returns True if its suspicious else False.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        domain : str</span>
-<span class="sd">            Domain you want to look for (Don&#39;t include &#39;https://&#39;)</span>
+<span class="sd">            Domain you want to look for.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
-            <span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
-            <span class="n">auth_required</span><span class="o">=</span><span class="kc">False</span>
-        <span class="p">)</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Even if the function returns `False`, that doesn&#39;t mean the domain is always suspicious.</span>
+<span class="sd">        If the domain is not registered in the API database, or incorrect domain is entered,</span>
+<span class="sd">        the function will return `False`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">auth_required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -814,7 +827,7 @@ Client        </code>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fetch&#39;s Information for a domain</span>
+<span class="sd">        Fetch the information for a domain.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -825,8 +838,7 @@ Client        </code>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/info/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
@@ -847,23 +859,26 @@ Client        </code>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        domain : str</span>
-<span class="sd">            Domain you want to look for (Don&#39;t include &#39;https://&#39;)</span>
+<span class="sd">            Domain you want to report as a phising site.</span>
 <span class="sd">        guild : t.Optional[int]</span>
-<span class="sd">            Discord Guild ID you found the site link in</span>
+<span class="sd">            Discord Guild ID where you discovered the site link.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">guild</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;guild&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">guild</span><span class="p">)}</span>
 
-        <span class="n">status_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/report/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">status_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+            <span class="n">Route</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/report/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">204</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully reported the site `</span><span class="si">{</span><span class="n">guild</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -938,9 +953,9 @@ Client        </code>
 <span class="sd">    version : t.Optional[int]</span>
 <span class="sd">        Optional Argument for the API Version, Default to 1 for now</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
 
+    <span class="c1"># Session with lock for preventing deadlocks.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 </code></pre></div>
@@ -966,10 +981,7 @@ Client        </code>
 
     <div class="doc doc-contents ">
 
-      <p>Checks a domain, Returns True if its suspicious else False</p>
-<p>NOTE: Even if it returns false doesn't mean the domain isn't suspicious
-it's just that the domain isn't registered in the API's Database or you
-might have entered incorrect domain</p>
+      <p>Checks a domain, Returns True if its suspicious else False.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -985,7 +997,7 @@ might have entered incorrect domain</p>
       <tr>
         <td><code>domain</code></td>
         <td><code>str</code></td>
-        <td><p>Domain you want to look for (Don't include 'https://')</p></td>
+        <td><p>Domain you want to look for.</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -994,26 +1006,26 @@ might have entered incorrect domain</p>
           <summary>Source code in <code>phisherman/app.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">check_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks a domain, Returns True if its suspicious else False</span>
-
-<span class="sd">    NOTE: Even if it returns false doesn&#39;t mean the domain isn&#39;t suspicious</span>
-<span class="sd">    it&#39;s just that the domain isn&#39;t registered in the API&#39;s Database or you</span>
-<span class="sd">    might have entered incorrect domain</span>
+<span class="sd">    Checks a domain, Returns True if its suspicious else False.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    domain : str</span>
-<span class="sd">        Domain you want to look for (Don&#39;t include &#39;https://&#39;)</span>
+<span class="sd">        Domain you want to look for.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
-        <span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
-        <span class="n">auth_required</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Even if the function returns `False`, that doesn&#39;t mean the domain is always suspicious.</span>
+<span class="sd">    If the domain is not registered in the API database, or incorrect domain is entered,</span>
+<span class="sd">    the function will return `False`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">auth_required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -1027,6 +1039,7 @@ might have entered incorrect domain</p>
     </div>
 
   </div>
+
 
 
 
@@ -1045,13 +1058,12 @@ might have entered incorrect domain</p>
 
     <div class="doc doc-contents ">
 
-      <p>Close the client session with this async function</p>
+      <p>Close the client session.</p>
 
         <details class="quote">
           <summary>Source code in <code>phisherman/app.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Close the client session with this async function&quot;&quot;&quot;</span>
-
+    <span class="sd">&quot;&quot;&quot;Close the client session.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
@@ -1067,7 +1079,7 @@ might have entered incorrect domain</p>
 
 
 <h4 id="phisherman.app.Client.fetch" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">text_response</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_status</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">auth_required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-async"><code>async</code></small>
@@ -1096,11 +1108,44 @@ might have entered incorrect domain</p>
         <td><p>The API route you want to make a call to</p></td>
         <td><em>required</em></td>
       </tr>
+      <tr>
+        <td><code>headers</code></td>
+        <td><code>dict</code></td>
+        <td><p>Headers for the API call, Defaults to None</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>dict</code></td>
+        <td><p>Data for the API call, Defaults to None</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>text_response</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether or not to expect text response, Defaults to False</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>auth_required</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether or not the auth token is required, Defaults to True</p></td>
+        <td><code>True</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>phisherman/app.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n">Route</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">route</span><span class="p">:</span> <span class="n">Route</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">text_response</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">auth_required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetching a response from the API</span>
 
@@ -1108,23 +1153,26 @@ might have entered incorrect domain</p>
 <span class="sd">    ----------</span>
 <span class="sd">    route : Route</span>
 <span class="sd">        The API route you want to make a call to</span>
+<span class="sd">    headers : dict</span>
+<span class="sd">        Headers for the API call, Defaults to None</span>
+<span class="sd">    data : dict</span>
+<span class="sd">        Data for the API call, Defaults to None</span>
+<span class="sd">    text_response : bool</span>
+<span class="sd">        Whether or not to expect text response, Defaults to False</span>
+<span class="sd">    auth_required : bool</span>
+<span class="sd">        Whether or not the auth token is required, Defaults to True</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    t.Optional[dict]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">headers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="p">{})</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">text_response</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;text_response&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-    <span class="n">return_status</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;return_status&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-    <span class="n">auth_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;auth_required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USER_AGENT</span><span class="p">,</span> <span class="o">**</span><span class="n">headers</span><span class="p">}</span>
 
-    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USER_AGENT</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">headers</span>
-    <span class="p">}</span>
-
+    <span class="c1"># TODO: Remove this auth_required logic. Redundant, as if the endpoint doesn&#39;t require auth,</span>
+    <span class="c1"># it&#39;ll never be read, and hence passing it won&#39;t change anything.</span>
     <span class="k">if</span> <span class="n">auth_required</span><span class="p">:</span>
         <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -1133,16 +1181,12 @@ might have entered incorrect domain</p>
 
     <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-            <span class="n">route</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-            <span class="n">route</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">route</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">route</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">return_status</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span>
 
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span> <span class="ow">or</span> <span class="mi">201</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">text_response</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">res</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1175,7 +1219,7 @@ might have entered incorrect domain</p>
 
     <div class="doc doc-contents ">
 
-      <p>Fetch's Information for a domain</p>
+      <p>Fetch the information for a domain.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1200,7 +1244,7 @@ might have entered incorrect domain</p>
           <summary>Source code in <code>phisherman/app.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fetch&#39;s Information for a domain</span>
+<span class="sd">    Fetch the information for a domain.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1211,8 +1255,7 @@ might have entered incorrect domain</p>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/info/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
@@ -1264,13 +1307,13 @@ might have entered incorrect domain</p>
       <tr>
         <td><code>domain</code></td>
         <td><code>str</code></td>
-        <td><p>Domain you want to look for (Don't include 'https://')</p></td>
+        <td><p>Domain you want to report as a phising site.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>guild</code></td>
         <td><code>Optional[int]</code></td>
-        <td><p>Discord Guild ID you found the site link in</p></td>
+        <td><p>Discord Guild ID where you discovered the site link.</p></td>
         <td><code>None</code></td>
       </tr>
   </tbody>
@@ -1284,23 +1327,26 @@ might have entered incorrect domain</p>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    domain : str</span>
-<span class="sd">        Domain you want to look for (Don&#39;t include &#39;https://&#39;)</span>
+<span class="sd">        Domain you want to report as a phising site.</span>
 <span class="sd">    guild : t.Optional[int]</span>
-<span class="sd">        Discord Guild ID you found the site link in</span>
+<span class="sd">        Discord Guild ID where you discovered the site link.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="n">guild</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;guild&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">guild</span><span class="p">)}</span>
 
-    <span class="n">status_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">Route</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/report/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">status_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+        <span class="n">Route</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/domains/report/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">204</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully reported the site `</span><span class="si">{</span><span class="n">guild</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -1387,7 +1433,7 @@ Route        </code>
   <tbody>
       <tr>
         <td><code>method</code></td>
-        <td><code>str</code></td>
+        <td><code>t.Literal[&#34;GET&#34;, &#34;POST&#34;, &#34;PUT&#34;, &#34;DELETE&#34;, &#34;PATCH&#34;]</code></td>
         <td><p>Method for the API Call</p></td>
       </tr>
       <tr>
@@ -1405,7 +1451,7 @@ Route        </code>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    method : str</span>
+<span class="sd">    method : t.Literal[&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;PATCH&quot;]</span>
 <span class="sd">        Method for the API Call</span>
 <span class="sd">    path : str</span>
 <span class="sd">        Endpoints for the API</span>
@@ -1413,7 +1459,9 @@ Route        </code>
 
     <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.phisherman.gg/v1&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a route</span>
 
@@ -1425,13 +1473,12 @@ Route        </code>
 <span class="sd">            Endpoints for the API</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Base URL&quot;&quot;&quot;</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">BASE_URL</span>
 
     <span class="nd">@base_url</span><span class="o">.</span><span class="n">setter</span>
@@ -1444,13 +1491,11 @@ Route        </code>
 <span class="sd">        url : str</span>
 <span class="sd">            the URL you want to set</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">BASE_URL</span> <span class="o">=</span> <span class="n">url</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return&#39;s the route i.e the base URL plus the given path&quot;&quot;&quot;</span>
-
+        <span class="sd">&quot;&quot;&quot;Returns the complete route with the&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
 </code></pre></div>
         </details>
@@ -1504,7 +1549,7 @@ Route        </code>
 
     <div class="doc doc-contents ">
 
-      <p>Return's the route i.e the base URL plus the given path</p>
+      <p>Returns the complete route with the</p>
     </div>
 
   </div>
@@ -1544,7 +1589,7 @@ Route        </code>
   <tbody>
       <tr>
         <td><code>method</code></td>
-        <td><code>str</code></td>
+        <td><code>Literal[&#39;GET&#39;, &#39;POST&#39;, &#39;PUT&#39;, &#39;DELETE&#39;, &#39;PATCH&#39;]</code></td>
         <td><p>Method for the API Call</p></td>
         <td><em>required</em></td>
       </tr>
@@ -1558,7 +1603,9 @@ Route        </code>
 </table>
         <details class="quote">
           <summary>Source code in <code>phisherman/route.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct a route</span>
 
@@ -1570,7 +1617,7 @@ Route        </code>
 <span class="sd">        Endpoints for the API</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 </code></pre></div>
         </details>

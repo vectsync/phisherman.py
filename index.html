@@ -65,6 +65,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#about" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -233,9 +238,52 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="." class="md-nav__link md-nav__link--active">
         Home
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#about" class="md-nav__link">
+    About
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    Links
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -278,6 +326,51 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#about" class="md-nav__link">
+    About
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    Links
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
@@ -290,9 +383,40 @@
 
   <h1>Home</h1>
 
+<p>
+<a href="https://pypi.org/project/phisherman.py">
+    <img height="20" alt="PyPI version" src="https://img.shields.io/pypi/v/phisherman.py">
+</a>
+
+<a href="https://pypi.org/project/flake8/">
+    <img height="20" alt="Flake badge" src="https://img.shields.io/badge/code%20style-flake8-blue.svg">
+</a>
+
+<a href="https://qristalabs.github.io/phisherman.py">
+    <img height="20" alt="Documentation status" src="https://img.shields.io/badge/documentation-up-00FF00.svg">
+</a>
+</p>
+
+<h3 id="about">About</h3>
+<p>Phisherman.py is an async API wrapper made in Python for <a href="https://phisherman.gg">Phisherman.gg</a> which is a centralised database and scam links and is mainly designed for Discord bots to check URLs for any phishing links</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-Python">import asyncio
+from phisherman import Client
+
+app = Client(token=&quot;Your Token&quot;)
+
+async def main():
+    if await app.check_domain(&quot;internetbadguys.com&quot;):
+        print(&quot;Detected suspicious.&quot;)
+
+    await app.close()
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+</code></pre>
+<h3 id="links">Links</h3>
 <p><strong>Source Code</strong>: <a href="https://github.com/QristaLabs/phisherman.py">github.com/QristaLabs/phisherman.py</a><br>
 <strong>PyPi</strong>: <a href="https://pypi.org/project/phisherman.py">pypi.org/project/phisherman.py</a></p>
-<p>Phisherman.py is an async API wrapper made in Python for <a href="https://phisherman.gg">Phisherman.gg</a> which is a centralised database and scam links and is mainly designed for Discord bots to check URLs for any phishing links</p>
 
               
             </article>
