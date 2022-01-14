@@ -8,7 +8,6 @@ import aiohttp
 from .exceptions import InvalidRequest, MissingPermission
 from .route import Route
 
-
 logger = logging.getLogger(__name__)
 
 __all__: t.Tuple[str, ...] = ("Client",)
@@ -45,6 +44,7 @@ class Client:
         """
 
         self.token = token
+
         self._session = None
         self._lock = asyncio.Lock()
 
@@ -78,18 +78,15 @@ class Client:
                 data=data,
                 **kwargs
             ) as res:
-                # If return status is True, return the status code.
                 if return_status:
                     return res.status
 
-                # If status code is between 200 and 300.
-                if 300 > res.status >= 200:
+                if res.status == 200 or 201:
                     if text_response:
                         data = await res.text()
                     else:
                         data = await res.json()
 
-                # Else, set to None.
                 else:
                     data = None
 
@@ -112,7 +109,11 @@ class Client:
         -------
         bool
         """
-        data = await self.fetch(Route("GET", f"/domains/{domain}"), text_response=True, auth_required=False)
+
+        data = await self.fetch(
+            Route("GET", f"/domains/{domain}"),
+            auth_required=False
+        )
 
         if not data:
             return False
@@ -150,7 +151,7 @@ class Client:
 
         return data[domain]
 
-    async def report_phish(self, domain: str, guild: t.Optional[int]) -> bool:
+    async def report_phish(self, domain: str, guild: t.Optional[int] = None) -> bool:
         """
         Report a site for phishing
 
@@ -160,8 +161,12 @@ class Client:
             Domain you want to look for (Don't include 'https://')
         guild : t.Optional[int]
             Discord Guild ID you found the site link in
+
+        Returns
+        -------
+        bool
         """
-        
+
         data = None
 
         if guild:
