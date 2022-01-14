@@ -19,7 +19,6 @@ repos:
     hooks:
       - id: check-merge-conflict
       - id: check-toml
-      - id: end-of-file-fixer
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
       - id: mixed-line-ending
