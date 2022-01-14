@@ -8,16 +8,17 @@ import aiohttp
 from .exceptions import InvalidRequest, MissingPermission
 from .route import Route
 
-logger = logging.getLogger(__name__)
-
 __all__: t.Tuple[str, ...] = ("Client",)
+
+# Logging.
+logger = logging.getLogger(__name__)
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
 class Client:
     """
-    Client class for the Phiserman API Wrapper.
+    Client class for the Phisherman API Wrapper.
 
     Attributes
     ----------
@@ -28,8 +29,7 @@ class Client:
     session : aiohttp.ClientSession
         For creating client session and to make requests
     """
-
-    USER_AGENT = f"Phisherman API wrapper. Python/{PYTHON_VERSION} Aiohttp/{aiohttp.__version__}"
+    USER_AGENT = f"Phisherman API wrapper - Python/{PYTHON_VERSION} AIOHTTP/{aiohttp.__version__}"
 
     def __init__(self, token: str) -> None:
         """
@@ -42,15 +42,14 @@ class Client:
         version : t.Optional[int]
             Optional Argument for the API Version, Default to 1 for now
         """
-
         self.token = token
 
+        # Session with lock for preventing deadlocks.
         self._session = None
         self._lock = asyncio.Lock()
 
     async def close(self) -> None:
-        """Close the client session with this async function"""
-
+        """Close the client session."""
         if self._session is not None:
             await self._session.close()
 
@@ -67,7 +66,6 @@ class Client:
         -------
         t.Optional[dict]
         """
-
         headers = kwargs.pop("headers", {})
         data = kwargs.pop("data", None)
         text_response = kwargs.pop("text_response", False)
@@ -79,6 +77,8 @@ class Client:
             **headers
         }
 
+        # TODO: Remove this auth_required logic. Redundant, as if the endpoint doesn't require auth,
+        # it'll never be read, and hence passing it won't change anything.
         if auth_required:
             headers["Authorization"] = f"Bearer {self.token}"
 
@@ -96,7 +96,7 @@ class Client:
                 if return_status:
                     return res.status
 
-                if res.status == 200 or 201:
+                if res.status in [200, 201]:
                     if text_response:
                         data = await res.text()
                     else:
@@ -107,23 +107,32 @@ class Client:
 
         return data
 
+    # Utility methods.
+    @staticmethod
+    def clean_domain(domain: str) -> str:
+        return domain.replace("https://", "").replace("http://", "")
+
+    # Main methods.
     async def check_domain(self, domain: str) -> bool:
         """
-        Checks a domain, Returns True if its suspicious else False
-
-        NOTE: Even if it returns false doesn't mean the domain isn't suspicious
-        it's just that the domain isn't registered in the API's Database or you
-        might have entered incorrect domain
+        Checks a domain, Returns True if its suspicious else False.
 
         Parameters
         ----------
         domain : str
-            Domain you want to look for (Don't include 'https://')
+            Domain you want to look for.
 
         Returns
         -------
         bool
+
+        Notes
+        -----
+        Even if the function returns `False`, that doesn't mean the domain is always suspicious.
+        If the domain is not registered in the API database, or incorrect domain is entered,
+        the function will return `False`
         """
+        domain = self.clean_domain(domain)
 
         data = await self.fetch(
             Route("GET", f"/domains/{domain}"),
@@ -140,7 +149,7 @@ class Client:
 
     async def fetch_info(self, domain: str) -> dict:
         """
-        Fetch's Information for a domain
+        Fetch the information for a domain.
 
         Parameters
         ----------
@@ -151,8 +160,7 @@ class Client:
         -------
         dict
         """
-
-        domain = domain.replace("https://", "").replace("http://", "")
+        domain = self.clean_domain(domain)
 
         data = await self.fetch(Route("GET", f"/domains/info/{domain}"))
 
@@ -173,15 +181,15 @@ class Client:
         Parameters
         ----------
         domain : str
-            Domain you want to look for (Don't include 'https://')
+            Domain you want to report as a phising site.
         guild : t.Optional[int]
-            Discord Guild ID you found the site link in
+            Discord Guild ID where you discovered the site link.
 
         Returns
         -------
         bool
         """
-
+        domain = self.clean_domain(domain)
         data = None
 
         if guild:

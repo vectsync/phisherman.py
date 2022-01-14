@@ -31,13 +31,12 @@ class Route:
             Endpoints for the API
         """
 
-        self.method = method
+        self.method = method.upper()
         self.path = path
 
     @property
     def base_url(self) -> str:
         """Base URL"""
-
         return self.BASE_URL
 
     @base_url.setter
@@ -50,11 +49,9 @@ class Route:
         url : str
             the URL you want to set
         """
-
         self.BASE_URL = url
 
     @property
     def url(self) -> str:
-        """Return's the route i.e the base URL plus the given path"""
-
+        """Returns the complete route with the """
         return self.base_url + self.path
