@@ -42,6 +42,8 @@ async def main():
     if await app.check_domain("internetbadguys.com"):
         print("Detected suspicious.")
 
+    await app.close()
+
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
 ```
