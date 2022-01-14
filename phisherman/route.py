@@ -1,5 +1,6 @@
 import typing as t
 
+
 class Route:
     """
     Class used for constructing API endpoints with a given base URL
