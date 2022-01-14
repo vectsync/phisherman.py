@@ -5,23 +5,23 @@ repo_url: https://github.com/QristaLabs/phisherman.py/
 repo_name: QristaLabs/phisherman.py
 
 theme:
-  palette: 
+  palette:
     - scheme: default
       toggle:
         icon: material/lightbulb
         name: Switch to dark mode
-    - scheme: slate 
+    - scheme: slate
       toggle:
         icon: material/lightbulb-outline
         name: Switch to light mode
-  icon: 
+  icon:
     repo: fontawesome/brands/github
   name: "material"
 
 nav:
-    - Home: index.md
-    - Installation: installation.md
-    - Code Reference: code-reference.md
+  - Home: index.md
+  - Installation: installation.md
+  - Code Reference: code-reference.md
 
 plugins:
   - search
