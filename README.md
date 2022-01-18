@@ -20,7 +20,7 @@ Asynchronous Python API Wrapper for phisherman.gg
 
 ## Installation
 
-**Python 3.8+ is required**
+**Python 3.8 or above is required**
 
 ```sh
 # Stable
@@ -44,8 +44,7 @@ async def main():
 
     await app.close()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+asyncio.run(main())
 ```
 
 ## Links
