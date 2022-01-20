@@ -1,7 +1,7 @@
 from .app import Client
 from .exceptions import InvalidRequest, MissingPermission
 
-__version__ = "0.1.1"
+__version__ = "1.0.0"
 __author__ = "Qristalabs"
 __copyright__ = "Copyright (c) Qristalabs"
 __license__ = "MIT"
