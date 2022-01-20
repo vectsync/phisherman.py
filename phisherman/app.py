@@ -144,7 +144,14 @@ class Client:
         """
         domain = self.clean_domain(domain)
 
-        data = await self.fetch(Route("GET", f"/domains/{domain}"), auth_required=False)
+        data = await self.fetch(
+            Route("GET", f"/domains/{domain}"),
+            text_response=True,
+            auth_required=False,
+            headers={
+                "Content-Type": "text/plain"
+            }
+        )
 
         if not data:
             return False
@@ -152,7 +159,7 @@ class Client:
         if "missing permission" in data:
             raise MissingPermission("You don't have permission to access this API")
 
-        return True if data == b"true" else False
+        return True if data == 'true' else False
 
     async def fetch_info(self, domain: str) -> dict:
         """
