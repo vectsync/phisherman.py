@@ -30,7 +30,7 @@ taskipy = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 mkdocs = "^1.2.3"
-mkdocstrings = "^0.18.0"
+mkdocstrings = "^0.18.1"
 pytkdocs = {extras = ["numpy-style"], version = "^0.16.0"}
 autopep8 = "^1.6.0"
 flake8 = "^4.0.1"
