@@ -6,6 +6,7 @@ import typing as t
 import aiohttp
 
 from .exceptions import InvalidRequest, MissingPermission
+from .models import DomainCheck
 from .route import Route
 
 __all__: t.Tuple[str, ...] = ("Client",)
@@ -60,11 +61,10 @@ class Client:
         self,
         route: Route,
         *,
-        headers: dict = None,
-        data: dict = None,
+        headers: t.Optional[dict] = None,
+        data: t.Optional[dict] = None,
         text_response: bool = False,
-        return_status: str = False,
-        auth_required: bool = True,
+        return_status: bool = False
     ) -> t.Optional[dict]:
         """
         Fetching a response from the API
@@ -79,8 +79,6 @@ class Client:
             Data for the API call, Defaults to None
         text_response : bool
             Whether or not to expect text response, Defaults to False
-        auth_required : bool
-            Whether or not the auth token is required, Defaults to True
 
         Returns
         -------
@@ -89,12 +87,11 @@ class Client:
         if headers is None:
             headers = {}
 
-        headers = {"User-Agent": self.USER_AGENT, **headers}
-
-        # TODO: Remove this auth_required logic. Redundant, as if the endpoint doesn't require auth,
-        # it'll never be read, and hence passing it won't change anything.
-        if auth_required:
-            headers["Authorization"] = f"Bearer {self.token}"
+        headers = {
+            "User-Agent": self.USER_AGENT,
+            "Authorization": f"Bearer {self.token}",
+            **headers
+        }
 
         if not self._session:
             self._session = aiohttp.ClientSession()
@@ -106,14 +103,27 @@ class Client:
                 if return_status:
                     return res.status
 
-                if res.status in [200, 201]:
+                # Handle status codes
+                if res.status in [200, 201, 204]:
                     if text_response:
                         data = await res.text()
                     else:
                         data = await res.json()
 
-                else:
-                    data = None
+                if res.status == 400:
+                    raise InvalidRequest("Bad request - Request performed was invalid.")
+
+                if res.status == 401:
+                    raise MissingPermission("Request not authenticated - Check your API token.")
+
+                if res.status == 403:
+                    raise MissingPermission("Permission not exists - Check your Permissions for API.")
+
+                if res.status == 429:
+                    raise InvalidRequest("Too many requests - Slow down your requests.")
+
+                if res.status == 500:
+                    raise InvalidRequest("Internal Server Error - Something went wrong.")
 
         return data
 
@@ -123,9 +133,9 @@ class Client:
         return domain.replace("https://", "").replace("http://", "")
 
     # Main methods.
-    async def check_domain(self, domain: str) -> bool:
+    async def check_domain(self, domain: str) -> t.Optional[DomainCheck]:
         """
-        Checks a domain, Returns True if its suspicious else False.
+        Checks a domain, Returns DomainCheck model with data.
 
         Parameters
         ----------
@@ -134,34 +144,20 @@ class Client:
 
         Returns
         -------
-        bool
-
-        Notes
-        -----
-        Even if the function returns `False`, that doesn't mean the domain is always suspicious.
-        If the domain is not registered in the API database, or incorrect domain is entered,
-        the function will return `False`
+        DomainCheck
         """
         domain = self.clean_domain(domain)
 
         data = await self.fetch(
-            Route("GET", f"/domains/{domain}"),
-            text_response=True,
-            auth_required=False,
-            headers={
-                "Content-Type": "text/plain"
-            }
+            Route("GET", f"/domains/check/{domain}"),
         )
 
         if not data:
-            return False
+            return None
 
-        if "missing permission" in data:
-            raise MissingPermission("You don't have permission to access this API")
+        return DomainCheck.from_dict(data)
 
-        return True if data == 'true' else False
-
-    async def fetch_info(self, domain: str) -> dict:
+    async def fetch_info(self, domain: str) -> t.Optional[dict]:  # TODO: Convert to custom dataclass.
         """
         Fetch the information for a domain.
 
@@ -179,12 +175,7 @@ class Client:
         data = await self.fetch(Route("GET", f"/domains/info/{domain}"))
 
         if not data:
-            return {}
-
-        success = data.get("success", False)
-        if not success:
-            if data.get("message", "") == "missing permission":
-                raise InvalidRequest("Invalid Request, Check your domain.")
+            return None
 
         return data[domain]
 

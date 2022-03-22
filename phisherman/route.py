@@ -13,7 +13,7 @@ class Route:
         Endpoints for the API
     """
 
-    BASE_URL = "https://api.phisherman.gg/v1"
+    BASE_URL = "https://api.phisherman.gg/v2"
 
     def __init__(
         self, method: t.Literal["GET", "POST", "PUT", "DELETE", "PATCH"], path: str
