@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from typing import Literal
 
 from .utils.metaclasses import FromDictMeta
 
 
 @dataclass
 class DomainCheck(metaclass=FromDictMeta):
-    classification: str
+    classification: Literal["malicious", "suspicious", "unknown", "safe"]
     verified_phish: bool
 
     @classmethod
