@@ -6,11 +6,11 @@ from .utils.metaclasses import FromDictMeta
 @dataclass
 class DomainCheck(metaclass=FromDictMeta):
     classification: str
-    verifiedPhish: bool
+    verified_phish: bool
 
     @classmethod
     def from_dict(cls, data: dict) -> "DomainCheck":
         return cls(
             classification=data.get("classification", ""),
-            verifiedPhish=data.get("verifiedPhish", False),
+            verified_phish=data.get("verifiedPhish", False),
         )
