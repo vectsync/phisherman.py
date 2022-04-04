@@ -158,14 +158,15 @@ pyflakes = ">=2.4.0,<2.5.0"
 
 [[package]]
 name = "flake8-annotations"
-version = "2.7.0"
+version = "2.8.0"
 description = "Flake8 Type Annotation Checks"
 category = "dev"
 optional = false
-python-versions = ">=3.6.2,<4.0.0"
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-flake8 = ">=3.7,<5.0"
+attrs = ">=21.4,<22.0"
+flake8 = ">=3.7"
 
 [[package]]
 name = "flake8-bugbear"
@@ -622,7 +623,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "7e0883fb376dcce6504f69f7fb1489bb1bc540d330bdc03f4eba12ba4c25d2e6"
+content-hash = "f7f16aa49e9c49a3f5abc5043616d636b03c4f835ce218a00a85210a429e74cf"
 
 [metadata.files]
 aiohttp = [
@@ -751,8 +752,8 @@ flake8 = [
     {file = "flake8-4.0.1.tar.gz", hash = "sha256:806e034dda44114815e23c16ef92f95c91e4c71100ff52813adf7132a6ad870d"},
 ]
 flake8-annotations = [
-    {file = "flake8-annotations-2.7.0.tar.gz", hash = "sha256:52e53c05b0c06cac1c2dec192ea2c36e85081238add3bd99421d56f574b9479b"},
-    {file = "flake8_annotations-2.7.0-py3-none-any.whl", hash = "sha256:3edfbbfb58e404868834fe6ec3eaf49c139f64f0701259f707d043185545151e"},
+    {file = "flake8-annotations-2.8.0.tar.gz", hash = "sha256:a2765c6043098aab0a3f519b871b33586c7fba7037686404b920cf8100cc1cdc"},
+    {file = "flake8_annotations-2.8.0-py3-none-any.whl", hash = "sha256:880f9bb0677b82655f9021112d64513e03caefd2e0d786ab4a59ddb5b262caa9"},
 ]
 flake8-bugbear = [
     {file = "flake8-bugbear-22.3.20.tar.gz", hash = "sha256:152e64a86f6bff6e295d630ccc993f62434c1fd2b20d2fae47547cb1c1b868e0"},
