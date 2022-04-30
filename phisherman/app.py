@@ -132,7 +132,13 @@ class Client:
     def clean_domain(domain: str) -> str:
         return domain.replace("https://", "").replace("http://", "")
 
-    # Main methods.
+    @staticmethod
+    def ensure_url_protocol(url: str) -> str:
+        if not url.startswith("http://") and not url.startswith("https://"):
+            return f"http://{url}"
+        return url
+
+    # Region: Fetching info for domains
     async def check_domain(self, domain: str) -> t.Optional[DomainCheck]:
         """
         Checks a domain, Returns DomainCheck model with data.
@@ -178,34 +184,22 @@ class Client:
             return None
 
         return data[domain]
+    # Endregion
 
-    async def report_phish(self, domain: str, guild: t.Optional[int] = None) -> bool:
-        """
-        Report a site for phishing
+    # Region: Reporting phish
+    async def report_new_phish(self, phish_url: str) -> None:
+        phish_url = self.ensure_url_protocol(phish_url)
 
-        Parameters
-        ----------
-        domain : str
-            Domain you want to report as a phising site.
-        guild : t.Optional[int]
-            Discord Guild ID where you discovered the site link.
-
-        Returns
-        -------
-        bool
-        """
-        domain = self.clean_domain(domain)
-        data = None
-
-        if guild:
-            data = {"guild": str(guild)}
-
-        status_code = await self.fetch(
-            Route("POST", f"/domains/report/{domain}"), data=data
+        await self.fetch(
+            Route("PUT", "/phish/report"),
+            data={"url": phish_url}
         )
 
-        if status_code == 204:
-            logger.info(f"Successfully reported the site `{guild}`")
-            return True
-        else:
-            return False
+    async def report_caught_phish(self, domain: str, guild_id: t.Optional[int] = None) -> None:
+        domain = self.clean_domain(domain)
+
+        await self.fetch(
+            Route("POST", f"/phish/caught/{domain}"),
+            data={"guild_id": guild_id}
+        )
+    # Endregion
